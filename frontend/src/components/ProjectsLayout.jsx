@@ -6,7 +6,9 @@ const ProjectsLayout = () => {
   return (
     <div>
       <Header />
-      <Outlet />
+      <div className="pt-24">
+        <Outlet />
+      </div>
     </div>
   );
 };
