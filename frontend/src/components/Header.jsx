@@ -9,14 +9,14 @@ const Header = () => {
       </p>
 
       <div className="flex items-center text-sm gap-6 ">
-        <button
+        {/* <button
           type="button"
           className="cursor-pointer rounded-md 
         bg-transparent text-gray-700 hover:bg-gray-100 hover:text-indigo-600
         focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600/40 sm:py-3 sm:px-6 "
         >
-          <img className=" h-6 w-6" src={themeLight}></img>
-        </button>
+          <img className=" h-6 w-6" src={themeLight} alt="theme"></img>
+        </button> */}
 
         <p className=" font-bold text-gray-700">Hello User!</p>
 
