@@ -3,17 +3,17 @@ import themeLight from "../icons/themeLight.png";
 
 const Header = () => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-10 flex h-24 items-center justify-between bg-white px-14 shadow-md">
+    <header className="fixed top-0 left-0 right-0 z-10 flex h-24 items-center justify-between bg-white px-4 shadow-lg sm:px-14">
       <p className="text-base font-bold tracking-wide text-indigo-600 md:text-xl">
         TASKFLOW
       </p>
 
-      <div className="flex items-center gap-4 text-base md:gap-6 ">
+      <div className="flex items-center text-sm gap-6 ">
         <button
           type="button"
-          className="cursor-pointer rounded-md py-3 px-6 
+          className="cursor-pointer rounded-md 
         bg-transparent text-gray-700 hover:bg-gray-100 hover:text-indigo-600
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600/40"
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600/40 sm:py-3 sm:px-6 "
         >
           <img className=" h-6 w-6" src={themeLight}></img>
         </button>
@@ -22,7 +22,7 @@ const Header = () => {
 
         <button
           type="button"
-          className="cursor-pointer rounded-md bg-transparent py-3 px-6 font-semibold text-gray-700 hover:bg-gray-100 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600/40"
+          className="cursor-pointer rounded-md bg-transparent font-semibold text-gray-700 hover:bg-gray-100 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600/40 sm:py-3 sm:px-6"
         >
           Logout
         </button>

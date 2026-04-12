@@ -76,8 +76,8 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-lg flex flex-col gap-9 m-6">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-3 sm:p-0">
+      <div className="flex w-full max-w-md flex-col gap-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-lg m-4 sm:m-6 sm:gap-9 sm:p-8">
         <div>
           <p className="text-sm font-bold tracking-wide text-indigo-600">
             TASKFLOW
@@ -87,7 +87,7 @@ const Login = () => {
           </h1>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-3 sm:space-y-4" onSubmit={handleSubmit}>
           {!isSignIn && (
             <div className="space-y-1.5">
               <label
@@ -159,7 +159,7 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full rounded-md bg-indigo-600 py-3 text-center text-sm font-semibold text-white cursor-pointer hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600/40"
+            className="w-full cursor-pointer rounded-md bg-indigo-600 py-2.5 text-center text-sm font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600/40 sm:py-3"
           >
             {isSignIn ? "Sign In" : "Create Account"}
           </button>
@@ -170,7 +170,7 @@ const Login = () => {
         <div>
           <button
             type="button"
-            className="rounded-sm text-sm text-gray-500 hover:text-gray-700 cursor-pointer"
+            className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer"
             onClick={toggleAuthMode}
           >
             {isSignIn ? (
