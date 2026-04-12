@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { EMAIL_REGEX } from "../utils/constants.js";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../utils/constants.js";
+import { getEmailError, getPasswordError } from "../utils/helperFunctions.js";
+import { setUser } from "../utils/userSlice.js";
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -10,43 +14,27 @@ const Login = () => {
     email: "",
     password: ""
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleValidateEmail = () => {
-    const trimmed = email.trim();
-    if (trimmed === "") {
-      setFieldError((prev) => ({ ...prev, email: "Email is required" }));
-      return;
-    }
-    if (!EMAIL_REGEX.test(trimmed)) {
-      setFieldError((prev) => ({
-        ...prev,
-        email: "Enter a valid email address"
-      }));
-      return;
-    }
-    setFieldError((prev) => ({ ...prev, email: "" }));
+    const msg = getEmailError(email);
+    setFieldError((prev) => ({ ...prev, email: msg }));
   };
 
   const handleValidatePassword = () => {
-    if (password.length === 0) {
-      setFieldError((prev) => ({ ...prev, password: "Password is required" }));
-      return;
-    }
-    if (!isSignIn && password.length < 8) {
-      setFieldError((prev) => ({
-        ...prev,
-        password: "Password must be at least 8 characters"
-      }));
-      return;
-    }
-    setFieldError((prev) => ({ ...prev, password: "" }));
+    const msg = getPasswordError(password, isSignIn);
+    setFieldError((prev) => ({ ...prev, password: msg }));
   };
 
   const handleEmailChange = (e) => {
     const value = e.target.value;
     setEmail(value);
     const trimmed = value.trim();
-    if (trimmed !== "" && EMAIL_REGEX.test(trimmed)) {
+    if (trimmed !== "" && getEmailError(value) === "") {
       setFieldError((prev) => ({ ...prev, email: "" }));
     }
   };
@@ -54,17 +42,91 @@ const Login = () => {
   const handlePasswordChange = (e) => {
     const value = e.target.value;
     setPassword(value);
-    if (isSignIn) {
-      if (value.length > 0) {
-        setFieldError((prev) => ({ ...prev, password: "" }));
-      }
-    } else if (value.length >= 8) {
+    if (getPasswordError(value, isSignIn) === "") {
       setFieldError((prev) => ({ ...prev, password: "" }));
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!isSignIn) {
+      return;
+    }
+
+    const emailErr = getEmailError(email);
+    const passwordErr = getPasswordError(password, isSignIn);
+    setFieldError({ email: emailErr, password: passwordErr });
+
+    if (emailErr !== "" || passwordErr !== "") {
+      return;
+    }
+
+    try {
+      setError("");
+      setIsLoading(true);
+
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw { status: response.status, data };
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      dispatch(setUser(data.user));
+      navigate("/projects");
+    } catch (err) {
+      const isHttpError =
+        err &&
+        typeof err === "object" &&
+        typeof err.status === "number" &&
+        err.data !== undefined;
+
+      if (isHttpError) {
+        const { status, data } = err;
+
+        if (status >= 400 && status < 500) {
+          const fields = data?.fields;
+          if (fields && typeof fields === "object" && !Array.isArray(fields)) {
+            setFieldError((prev) => ({
+              ...prev,
+              ...(fields?.email != null ? { email: String(fields.email) } : {}),
+              ...(fields?.password != null
+                ? { password: String(fields.password) }
+                : {})
+            }));
+          } else {
+            setError(
+              typeof data?.error === "string" && data.error
+                ? data.error
+                : "Something went wrong"
+            );
+          }
+        } else if (status >= 500) {
+          setError(
+            "Something went wrong on the server. Please try again later."
+          );
+        } else {
+          setError("Something went wrong");
+        }
+      } else {
+        setError(
+          "Something went wrong. Please check your connection and try again."
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const toggleAuthMode = () => {
@@ -73,6 +135,8 @@ const Login = () => {
     setFullName("");
     setEmail("");
     setPassword("");
+    setError("");
+    setIsLoading(false);
   };
 
   return (
@@ -159,13 +223,20 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full cursor-pointer rounded-md bg-indigo-600 py-2.5 text-center text-sm font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600/40 sm:py-3"
+            disabled={isLoading}
+            className={`w-full rounded-md py-2.5 text-center text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-indigo-600/40 sm:py-3 ${
+              isLoading
+                ? "cursor-not-allowed bg-indigo-400"
+                : "cursor-pointer bg-indigo-600 hover:bg-indigo-700"
+            }`}
           >
             {isSignIn ? "Sign In" : "Create Account"}
           </button>
         </form>
 
-        <div className="min-h-4 text-xs text-red-600" />
+        <div className="min-h-4 text-xs text-red-600">
+          {error ? <p>{error}</p> : null}
+        </div>
 
         <div>
           <button
