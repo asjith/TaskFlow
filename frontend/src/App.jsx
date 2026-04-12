@@ -4,6 +4,8 @@ import ProjectsLayout from "./components/ProjectsLayout";
 import ProjectList from "./components/ProjectList";
 import Project from "./components/Project";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Provider } from "react-redux";
+import store from "./utils/store.js";
 
 function App() {
   const appRouter = createBrowserRouter([
@@ -28,7 +30,9 @@ function App() {
   ]);
   return (
     <div>
-      <RouterProvider router={appRouter} />
+      <Provider store={store}>
+        <RouterProvider router={appRouter} />
+      </Provider>
     </div>
   );
 }
