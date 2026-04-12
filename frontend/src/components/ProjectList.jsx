@@ -40,7 +40,7 @@ const ProjectList = () => {
       }
 
       setProjectList(data.projects);
-      dispatch(setUser(user));
+      dispatch(setUser(JSON.parse(user)));
     } catch (err) {
       const status =
         err && typeof err === "object" && typeof err.status === "number"
