@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../utils/constants.js";
-import { clearUser, setUser } from "../utils/userSlice.js";
+import { clearUser } from "../utils/userSlice.js";
 import Loading from "./Loading.jsx";
 import Error from "./Error.jsx";
 import ProjectCard from "./ProjectCard.jsx";
@@ -15,17 +15,12 @@ const ProjectList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
   const fetchProjects = useCallback(async () => {
     try {
       setError(false);
       setIsLoading(true);
 
       const token = localStorage.getItem("token");
-      const user = localStorage.getItem("user");
       const response = await fetch(`${API_BASE_URL}/projects`, {
         method: "GET",
         headers: {
@@ -40,7 +35,6 @@ const ProjectList = () => {
       }
 
       setProjectList(data.projects);
-      dispatch(setUser(JSON.parse(user)));
     } catch (err) {
       const status =
         err && typeof err === "object" && typeof err.status === "number"
@@ -64,6 +58,10 @@ const ProjectList = () => {
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    fetchProjects();
   }, []);
 
   if (isLoading) {

@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../utils/constants.js";
 import { getEmailError, getPasswordError } from "../utils/helperFunctions.js";
-import { setUser } from "../utils/userSlice.js";
+import { clearUser, setUser } from "../utils/userSlice.js";
+import Loading from "./Loading.jsx";
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -16,9 +17,85 @@ const Login = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isCheckingSession, setIsCheckingSession] = useState(() =>
+    Boolean(localStorage.getItem("token"))
+  );
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const validateToken = useCallback(async (token, signal) => {
+    try {
+      setIsCheckingSession(true);
+      setError("");
+
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        signal
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw { status: response.status, data };
+      }
+
+      localStorage.setItem("user", JSON.stringify(data.user));
+      dispatch(setUser(data.user));
+      navigate("/projects");
+    } catch (err) {
+      if (err?.name === "AbortError") {
+        return;
+      }
+
+      const status =
+        err && typeof err === "object" && typeof err.status === "number"
+          ? err.status
+          : undefined;
+
+      if (status === 401) {
+        localStorage.clear();
+        dispatch(clearUser());
+        return;
+      }
+
+      if (status !== undefined && status >= 400 && status < 500) {
+        setError(
+          "We couldn't verify your account right now. Please try again."
+        );
+        return;
+      }
+
+      if (status !== undefined && status >= 500) {
+        setError("Something went wrong on the server. Please try again later.");
+        return;
+      }
+
+      setError(
+        "Something went wrong. Please check your connection and try again."
+      );
+    } finally {
+      setIsCheckingSession(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setIsCheckingSession(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    validateToken(token, controller.signal);
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   const handleValidateEmail = () => {
     const msg = getEmailError(email);
@@ -138,6 +215,10 @@ const Login = () => {
     setError("");
     setIsLoading(false);
   };
+
+  if (isCheckingSession) {
+    return <Loading />;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-3 sm:p-0">
