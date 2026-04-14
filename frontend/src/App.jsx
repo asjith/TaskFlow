@@ -6,28 +6,31 @@ import Project from "./components/Project";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./utils/store.js";
+import { requireAuthLoader } from "./utils/helperFunctions.js";
+
+const appRouter = createBrowserRouter([
+  {
+    path: "/",
+    element: <Login />
+  },
+  {
+    path: "/projects",
+    loader: requireAuthLoader,
+    element: <ProjectsLayout />,
+    children: [
+      {
+        index: true,
+        element: <ProjectList />
+      },
+      {
+        path: ":id",
+        element: <Project />
+      }
+    ]
+  }
+]);
 
 function App() {
-  const appRouter = createBrowserRouter([
-    {
-      path: "/",
-      element: <Login />
-    },
-    {
-      path: "/projects",
-      element: <ProjectsLayout />,
-      children: [
-        {
-          index: true,
-          element: <ProjectList />
-        },
-        {
-          path: ":id",
-          element: <Project />
-        }
-      ]
-    }
-  ]);
   return (
     <div>
       <Provider store={store}>

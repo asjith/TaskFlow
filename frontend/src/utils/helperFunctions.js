@@ -1,4 +1,14 @@
+import { redirect } from "react-router-dom";
 import { EMAIL_REGEX } from "./constants.js";
+
+export function requireAuthLoader() {
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
+  if (!token || !user) {
+    throw redirect("/");
+  }
+  return null;
+}
 
 export function getEmailError(email) {
   const trimmed = email.trim();

@@ -19,11 +19,6 @@ const ProjectsLayout = () => {
     const hasToken = Boolean(token);
     const hasUser = rawUser != null && rawUser !== "";
 
-    if (!hasToken && !hasUser) {
-      navigate("/");
-      return;
-    }
-
     if (!hasToken || !hasUser) {
       localStorage.clear();
       dispatch(clearUser());
