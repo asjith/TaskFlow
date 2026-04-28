@@ -6,11 +6,13 @@ import { clearUser } from "../utils/userSlice.js";
 import Loading from "./Loading.jsx";
 import Error from "./Error.jsx";
 import ProjectCard from "./ProjectCard.jsx";
+import CreateProjectModal from "./CreateProjectModal.jsx";
 
 const ProjectList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
   const [projectList, setProjectList] = useState([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -79,6 +81,7 @@ const ProjectList = () => {
         <button
           type="button"
           className="rounded-md p-2.5 text-center text-sm font-semibold text-white cursor-pointer bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600/40 sm:py-3 sm:px-6"
+          onClick={() => setShowCreateModal(true)}
         >
           + New Project
         </button>
@@ -91,6 +94,9 @@ const ProjectList = () => {
           />
         ))}
       </div>
+      {showCreateModal ? (
+        <CreateProjectModal onClose={() => setShowCreateModal(false)} />
+      ) : null}
     </div>
   );
 };
