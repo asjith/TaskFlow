@@ -36,7 +36,7 @@ const ProjectList = () => {
         throw { status: response.status, data };
       }
 
-      setProjectList(data.projects);
+      setProjectList(data.projects.reverse());
     } catch (err) {
       const status =
         err && typeof err === "object" && typeof err.status === "number"
@@ -95,7 +95,10 @@ const ProjectList = () => {
         ))}
       </div>
       {showCreateModal ? (
-        <CreateProjectModal onClose={() => setShowCreateModal(false)} />
+        <CreateProjectModal
+          onClose={() => setShowCreateModal(false)}
+          getProjectList={fetchProjects}
+        />
       ) : null}
     </div>
   );
